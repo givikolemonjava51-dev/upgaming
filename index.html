@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Upgaming Padel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;1,800&family=Archivo+Black&family=Yellowtail&family=Noto+Sans+Georgian:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #060607;
+    --surface: #131317;
+    --surface-2: #1b1b20;
+    --ink: #f4f3ee;
+    --ink-dim: #93939c;
+    --border: #27272e;
+    --line: rgba(255,255,255,0.08);
+    --accent: #a6ff3e;
+    --accent-ink: #0a1204;
+    --pos2: #f0eee2;
+    --pos3: #6f707a;
+    --shadow: 0 8px 24px rgba(0,0,0,0.35);
+    --radius: 16px;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background-color:var(--bg);
+    background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.5px);
+    background-size: 24px 24px;
+    color:var(--ink);
+    font-family:'Noto Sans Georgian','JetBrains Mono',system-ui,sans-serif;
+    padding-inline:16px;
+    padding-block: 22px 64px;
+  }
+  .page{max-width:640px;margin:0 auto;}
+
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+
+  .hero{text-align:center;padding-block:10px 22px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .season-pill{
+    display:inline-block;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--ink-dim);
+    font-size:0.74rem;font-weight:700;letter-spacing:.03em;
+    padding:6px 16px;border-radius:999px;
+  }
+  .brand-lockup{display:flex;align-items:baseline;justify-content:center;gap:2px;flex-wrap:wrap;}
+  .brand-up{
+    font-family:'Archivo', sans-serif;
+    font-weight:800;font-style:italic;
+    font-size:1.5rem;color:var(--ink);letter-spacing:.01em;
+  }
+  .brand-script{
+    font-family:'Yellowtail', cursive;
+    font-size:2.3rem;color:var(--accent);
+    line-height:1;
+    transform:translateY(2px);
+  }
+  .brand-tournament{
+    font-family:'Archivo Black', sans-serif;
+    font-size:2.6rem;line-height:0.95;
+    color:var(--ink);letter-spacing:.02em;
+    text-wrap:balance;
+  }
+  .brand-tag{
+    font-family:'Archivo', sans-serif;
+    font-style:italic;font-weight:700;
+    color:var(--accent);font-size:0.92rem;
+  }
+
+  .view-toggle{
+    display:flex;gap:6px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:5px;
+  }
+  .view-btn{
+    flex:1;font:inherit;font-weight:700;font-size:0.92rem;
+    background:none;border:none;border-radius:999px;
+    padding:10px 12px;color:var(--ink-dim);cursor:pointer;
+  }
+  .view-btn.active{background:var(--pos2);color:#101012;}
+  .view-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .controls{
+    position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;
+    background:var(--bg);
+    padding-block:12px 14px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .row-controls{display:flex;gap:8px;}
+  #tableControls[hidden]{display:none;}
+
+  .pill-select{
+    width:100%;
+    appearance:none;-webkit-appearance:none;
+    font:inherit;font-weight:700;font-size:0.92rem;
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%2393939c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 14px center;
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:13px 40px 13px 16px;
+  }
+  .pill-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .tabs{display:flex;gap:8px;width:100%;}
+  #dayTabs[hidden]{display:none;}
+  .tab{
+    flex:1;font:inherit;font-weight:700;font-size:0.9rem;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:10px 10px;cursor:pointer;
+    color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;gap:1px;
+  }
+  .tab span{font-size:0.7rem;color:var(--ink-dim);font-weight:500;}
+  .tab.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .tab.active span{color:var(--accent-ink);opacity:0.75;}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .search-wrap{position:relative;}
+  .search-wrap input{
+    width:100%;font:inherit;font-size:0.95rem;
+    padding:13px 14px 13px 42px;
+    border-radius:14px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);outline:none;
+  }
+  .search-wrap input::placeholder{color:var(--ink-dim);}
+  .search-wrap input:focus{border-color:var(--accent);}
+  .search-wrap svg{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    width:17px;height:17px;color:var(--ink-dim);pointer-events:none;
+  }
+  .search-clear{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    border:none;background:none;color:var(--ink-dim);font-size:1.1rem;
+    padding:6px;cursor:pointer;display:none;line-height:1;
+  }
+  .search-wrap.has-query .search-clear{display:block;}
+
+  .ref-toggle{
+    align-self:flex-start;
+    font:inherit;font-weight:700;font-size:0.8rem;
+    background:var(--surface);border:1px solid var(--accent);
+    color:var(--accent);border-radius:999px;padding:8px 14px;cursor:pointer;
+  }
+  .ref-toggle.active{background:var(--accent);color:var(--accent-ink);}
+
+  /* ---- standings (Table view) ---- */
+  .standings-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+  }
+  .standings-head{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 14px 10px;
+    color:var(--ink-dim);font-size:0.66rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;
+  }
+  .standings-head .head-pos{width:40px;flex:none;}
+  .standings-head .head-team{flex:1;}
+  .standings-head .head-chevron{width:22px;flex:none;}
+  .standings-head .head-stats{flex:none;min-width:104px;display:flex;gap:14px;justify-content:flex-end;}
+  .standings-row{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 14px;border-top:1px solid var(--line);
+  }
+  .pos-badge{
+    flex:none;width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.64rem;font-weight:800;font-family:'JetBrains Mono',monospace;
+    border:1px solid var(--border);color:var(--ink-dim);
+  }
+  .pos-badge.pos-1{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .pos-badge.pos-2{background:var(--pos2);color:#101012;border-color:var(--pos2);}
+  .pos-badge.pos-3{background:var(--pos3);color:#101012;border-color:var(--pos3);}
+  .team-names{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .team-names span{font-weight:700;font-size:0.88rem;line-height:1.32;overflow-wrap:anywhere;}
+  .row-expand{
+    flex:none;width:22px;height:22px;border:none;background:none;
+    color:var(--ink-dim);cursor:pointer;font-size:0.9rem;
+    transition:transform .15s;
+  }
+  .row-expand.open{transform:rotate(180deg);color:var(--accent);}
+  .stat-cluster{flex:none;min-width:104px;display:flex;gap:14px;justify-content:flex-end;}
+  .stat{display:flex;flex-direction:column;align-items:center;gap:1px;}
+  .stat b{font-family:'JetBrains Mono',monospace;font-size:0.88rem;font-weight:700;}
+  .stat small{font-size:0.6rem;color:var(--ink-dim);}
+  .row-detail{
+    padding:0 14px 12px 62px;font-size:0.76rem;color:var(--ink-dim);
+    display:none;
+  }
+  .row-detail.open{display:block;}
+  .row-detail b{color:var(--ink);}
+  tr.tied td, .standings-row.tied .team-names{color:var(--ink-dim);}
+  .tie-flag{color:var(--accent);}
+  .tie-note{margin:10px 14px 14px;font-size:0.72rem;color:var(--ink-dim);}
+  .group-empty{padding:28px 14px;text-align:center;color:var(--ink-dim);font-size:0.88rem;}
+
+  /* ---- schedule (Schedule view) ---- */
+  .slot{margin-block-start:18px;}
+  .slot-head{display:flex;align-items:baseline;gap:10px;padding-block-end:8px;}
+  .slot-head .time{font-weight:700;font-size:1rem;font-family:'JetBrains Mono',monospace;}
+  .slot-head .count{color:var(--ink-dim);font-size:0.76rem;}
+  .slot-head::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit, minmax(260px,1fr));gap:8px;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:11px 12px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .card.has-result{border-color:var(--accent);}
+  .card-meta{display:flex;align-items:center;gap:6px;}
+  .chip{
+    font-size:0.68rem;font-weight:700;letter-spacing:.02em;
+    padding:3px 8px;border-radius:999px;font-family:'JetBrains Mono',monospace;
+  }
+  .chip.court-black{background:#000;color:var(--ink);border:1px solid var(--border);}
+  .chip.court-blue{background:var(--accent);color:var(--accent-ink);}
+  .chip.group{background:var(--surface-2);color:var(--ink-dim);}
+  .card-meta .day-time{margin-inline-start:auto;color:var(--ink-dim);font-size:0.72rem;font-family:'JetBrains Mono',monospace;}
+  .matchup{display:flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:500;}
+  .team{flex:1;line-height:1.25;}
+  .team.won{font-weight:800;color:var(--accent);}
+  .team mark{background:rgba(166,255,62,0.22);color:var(--accent);border-radius:4px;padding:0 2px;}
+  .vs{color:var(--ink-dim);font-size:0.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;flex:none;}
+  .vs.result{color:var(--accent);font-size:0.76rem;white-space:nowrap;}
+
+  .score-form{border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px;}
+  .set-row{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--ink-dim);}
+  .set-row .set-label{width:52px;flex:none;}
+  .set-input{
+    width:44px;height:36px;text-align:center;
+    font:inherit;font-family:'JetBrains Mono',monospace;font-weight:700;
+    border-radius:8px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);
+  }
+  .set-colon{color:var(--ink-dim);}
+  .result-live{font-size:0.78rem;font-weight:700;color:var(--accent);padding-top:2px;}
+
+  .empty{color:var(--ink-dim);padding:32px 12px;text-align:center;font-size:0.9rem;}
+
+  .save-toast{
+    position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+    transform:translateX(-50%);
+    background:var(--accent);color:var(--accent-ink);
+    padding:9px 16px;border-radius:999px;font-size:0.82rem;font-weight:700;
+    box-shadow:0 6px 20px rgba(0,0,0,0.4);z-index:20;
+  }
+  .save-toast.error{background:#ff5a4e;color:#1a0605;}
+
+  footer{margin-block-start:36px;text-align:center;color:var(--ink-dim);font-size:0.8rem;}
+
+  @media (max-width:420px){
+    .cards{grid-template-columns:1fr;}
+    .brand-tournament{font-size:2.15rem;}
+    .brand-script{font-size:1.9rem;}
+    .stat-cluster, .standings-head .head-stats{min-width:88px;gap:10px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="page">
+  <div class="hero">
+    <div class="season-pill">Autumn 2026</div>
+    <div class="brand-lockup"><span class="brand-up">UPGAMING</span><span class="brand-script">Padel</span></div>
+    <div class="brand-tournament">TOURNAMENT</div>
+    <div class="brand-tag">Smash your limits</div>
+  </div>
+
+  <div class="view-toggle" id="viewToggle" role="tablist">
+    <button class="view-btn active" data-view="table" type="button">Table</button>
+    <button class="view-btn" data-view="schedule" type="button">Schedule</button>
+  </div>
+
+  <div class="controls">
+    <div class="row-controls" id="tableControls">
+      <select id="groupSelect" class="pill-select"></select>
+    </div>
+    <div class="row-controls tabs" id="dayTabs" role="tablist" hidden></div>
+    <div class="search-wrap" id="searchWrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search" autocomplete="off" inputmode="search">
+      <button class="search-clear" id="searchClear" aria-label="Clear">&times;</button>
+    </div>
+    <button class="ref-toggle" id="refToggle" hidden type="button">Referee Mode</button>
+  </div>
+
+  <main id="mainArea"></main>
+
+  <footer>Good luck to everyone — Upgaming Padel</footer>
+</div>
+
+<div class="save-toast" id="saveToast" hidden></div>
+
+<script type="application/json" id="site-data">{"matches": [{"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:00", "court": "Black 1", "group": "F", "t1": "Lasha Dzneladze / Irakli Ghughunishvili", "t2": "Saba Baindurashvili / Mariam Munjishvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:00", "court": "Black 2", "group": "B", "t1": "Giorgi Krialashvili / Juba Topuria", "t2": "Irakli Kapanadze / Tamari Natobishvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:00", "court": "Blue 1", "group": "C", "t1": "Valeri Samsonidze / Nika Shavishvili", "t2": "Nikoloz Sakhvadze / Andria Kharbedia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:00", "court": "Blue 2", "group": "G", "t1": "Lizi Kaviladze / Goga Tchkadua", "t2": "Tornike Chomakhidze / Giorgi Mateshvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:00", "court": "Blue 3", "group": "H", "t1": "Giorgi Gendzekhadze / Sandro Gvaramia", "t2": "Nina Songhulashvili / Irakli Merabishvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:35", "court": "Black 1", "group": "F", "t1": "Saba Baindurashvili / Mariam Munjishvili", "t2": "Giorgi Buadze / Tamaz Jashi"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:35", "court": "Black 2", "group": "B", "t1": "Irakli Kapanadze / Tamari Natobishvili", "t2": "Niniko Khomeriki / Shota Glurjidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:35", "court": "Blue 1", "group": "C", "t1": "Nikoloz Sakhvadze / Andria Kharbedia", "t2": "Nugzar Kobakhidze / Nino Chkhetia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:35", "court": "Blue 2", "group": "G", "t1": "Tornike Chomakhidze / Giorgi Mateshvili", "t2": "Tsotne Kapanadze / Giorgi Tkhelidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "20:35", "court": "Blue 3", "group": "H", "t1": "Nina Songhulashvili / Irakli Merabishvili", "t2": "Giorgi Rekhviashvili / Koka Akhvlediani"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:10", "court": "Black 1", "group": "F", "t1": "Gigi Jokhadze / Lasha Motsonelidze", "t2": "Lasha Dzneladze / Irakli Ghughunishvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:10", "court": "Black 2", "group": "B", "t1": "Niniko Khomeriki / Shota Glurjidze", "t2": "Giorgi Sakvarelidze / Nika Jgerenaia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:10", "court": "Blue 1", "group": "C", "t1": "Nugzar Kobakhidze / Nino Chkhetia", "t2": "Mirian Intskirveli / Guja Iremashvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:10", "court": "Blue 2", "group": "G", "t1": "Tsotne Kapanadze / Giorgi Tkhelidze", "t2": "Aleko Chakvetadze / Merab Chikvinidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:10", "court": "Blue 3", "group": "H", "t1": "Giorgi Rekhviashvili / Koka Akhvlediani", "t2": "Saba Jinjikhadze / Saba Lobjanidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:45", "court": "Black 1", "group": "F", "t1": "Giorgi Buadze / Tamaz Jashi", "t2": "Zaur Soselia / Luka Soselia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:45", "court": "Black 2", "group": "B", "t1": "Giorgi Sakvarelidze / Nika Jgerenaia", "t2": "Giorgi Tsartsidze / Giorgi Girkelidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:45", "court": "Blue 1", "group": "C", "t1": "Mirian Intskirveli / Guja Iremashvili", "t2": "Tornike Kapanadze / Irakli Rukhaia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:45", "court": "Blue 2", "group": "G", "t1": "Aleko Chakvetadze / Merab Chikvinidze", "t2": "Giorgi Janelidze / Badri Gorgodze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "21:45", "court": "Blue 3", "group": "H", "t1": "Saba Jinjikhadze / Saba Lobjanidze", "t2": "Zuka Ghirdaladze / Aleks Kvaratskhelia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:20", "court": "Black 1", "group": "F", "t1": "Zaur Soselia / Luka Soselia", "t2": "Gigi Jokhadze / Lasha Motsonelidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:20", "court": "Black 2", "group": "B", "t1": "Giorgi Tsartsidze / Giorgi Girkelidze", "t2": "Giorgi Krialashvili / Juba Topuria"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:20", "court": "Blue 1", "group": "C", "t1": "Tornike Kapanadze / Irakli Rukhaia", "t2": "Valeri Samsonidze / Nika Shavishvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:20", "court": "Blue 2", "group": "G", "t1": "Giorgi Janelidze / Badri Gorgodze", "t2": "Lizi Kaviladze / Goga Tchkadua"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:20", "court": "Blue 3", "group": "H", "t1": "Zuka Ghirdaladze / Aleks Kvaratskhelia", "t2": "Giorgi Gendzekhadze / Sandro Gvaramia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:55", "court": "Black 1", "group": "A", "t1": "Lasha Narimanidze / Nodo Namoradze", "t2": "Luka Vardishvili / Irakli Lomidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:55", "court": "Black 2", "group": "D", "t1": "Irakli Kezherashvili / Mikheil Merebashvili", "t2": "Saba Tsaadze / Davit Lursmanashvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "22:55", "court": "Blue 1", "group": "E", "t1": "Irakli Gogokhia / Nika Gogokhia", "t2": "Davit Endeladze / Saba Paitchadze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "23:30", "court": "Black 1", "group": "A", "t1": "Luka Vardishvili / Irakli Lomidze", "t2": "Beka Ungiadze / Misho Maisuradze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "23:30", "court": "Black 2", "group": "D", "t1": "Tsotne Kikvilashvili / Salome Sabanadze", "t2": "Nika Siradze / Rusa Adamia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "23:30", "court": "Blue 1", "group": "E", "t1": "Davit Endeladze / Saba Paitchadze", "t2": "Avtandil Olgesashvili / Levan Beriashvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:05", "court": "Black 1", "group": "A", "t1": "Beka Ungiadze / Misho Maisuradze", "t2": "Saba Mania / Sukha Zviadauri"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:05", "court": "Black 2", "group": "D", "t1": "Nika Siradze / Rusa Adamia", "t2": "Irakli Kezherashvili / Mikheil Merebashvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:05", "court": "Blue 1", "group": "E", "t1": "Avtandil Olgesashvili / Levan Beriashvili", "t2": "Nikoloz Latsabidze / Ramini Tchumburidze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:40", "court": "Black 1", "group": "A", "t1": "Saba Mania / Sukha Zviadauri", "t2": "Lasha Tsaadze / Giorgi Mikadze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:40", "court": "Black 2", "group": "D", "t1": "Saba Tsaadze / Davit Lursmanashvili", "t2": "Sashka Ochigava / Giorgi Kvirikashvili"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "00:40", "court": "Blue 1", "group": "E", "t1": "Tornike Tchkonia / Goga Gochashvili", "t2": "Irakli Gogokhia / Nika Gogokhia"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "01:15", "court": "Black 1", "group": "A", "t1": "Lasha Tsaadze / Giorgi Mikadze", "t2": "Lasha Narimanidze / Nodo Namoradze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "01:15", "court": "Black 2", "group": "D", "t1": "Sashka Ochigava / Giorgi Kvirikashvili", "t2": "Tsotne Kikvilashvili / Salome Sabanadze"}, {"day": "Tuesday", "dayLabel": "სამშაბათი, 22 სექტემბერი", "time": "01:15", "court": "Blue 1", "group": "E", "t1": "Nikoloz Latsabidze / Ramini Tchumburidze", "t2": "Tornike Tchkonia / Goga Gochashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:00", "court": "Black 1", "group": "F", "t1": "Gigi Jokhadze / Lasha Motsonelidze", "t2": "Saba Baindurashvili / Mariam Munjishvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:00", "court": "Black 2", "group": "B", "t1": "Giorgi Krialashvili / Juba Topuria", "t2": "Niniko Khomeriki / Shota Glurjidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:00", "court": "Blue 1", "group": "C", "t1": "Valeri Samsonidze / Nika Shavishvili", "t2": "Nugzar Kobakhidze / Nino Chkhetia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:00", "court": "Blue 2", "group": "G", "t1": "Lizi Kaviladze / Goga Tchkadua", "t2": "Tsotne Kapanadze / Giorgi Tkhelidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:00", "court": "Blue 3", "group": "H", "t1": "Giorgi Gendzekhadze / Sandro Gvaramia", "t2": "Giorgi Rekhviashvili / Koka Akhvlediani"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:35", "court": "Black 1", "group": "F", "t1": "Saba Baindurashvili / Mariam Munjishvili", "t2": "Zaur Soselia / Luka Soselia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:35", "court": "Black 2", "group": "B", "t1": "Niniko Khomeriki / Shota Glurjidze", "t2": "Giorgi Tsartsidze / Giorgi Girkelidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:35", "court": "Blue 1", "group": "C", "t1": "Nugzar Kobakhidze / Nino Chkhetia", "t2": "Tornike Kapanadze / Irakli Rukhaia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:35", "court": "Blue 2", "group": "G", "t1": "Tsotne Kapanadze / Giorgi Tkhelidze", "t2": "Giorgi Janelidze / Badri Gorgodze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "20:35", "court": "Blue 3", "group": "H", "t1": "Giorgi Rekhviashvili / Koka Akhvlediani", "t2": "Zuka Ghirdaladze / Aleks Kvaratskhelia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:10", "court": "Black 1", "group": "F", "t1": "Zaur Soselia / Luka Soselia", "t2": "Lasha Dzneladze / Irakli Ghughunishvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:10", "court": "Black 2", "group": "B", "t1": "Giorgi Tsartsidze / Giorgi Girkelidze", "t2": "Irakli Kapanadze / Tamari Natobishvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:10", "court": "Blue 1", "group": "C", "t1": "Tornike Kapanadze / Irakli Rukhaia", "t2": "Nikoloz Sakhvadze / Andria Kharbedia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:10", "court": "Blue 2", "group": "G", "t1": "Giorgi Janelidze / Badri Gorgodze", "t2": "Tornike Chomakhidze / Giorgi Mateshvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:10", "court": "Blue 3", "group": "H", "t1": "Zuka Ghirdaladze / Aleks Kvaratskhelia", "t2": "Nina Songhulashvili / Irakli Merabishvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:45", "court": "Black 1", "group": "F", "t1": "Lasha Dzneladze / Irakli Ghughunishvili", "t2": "Giorgi Buadze / Tamaz Jashi"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:45", "court": "Black 2", "group": "B", "t1": "Irakli Kapanadze / Tamari Natobishvili", "t2": "Giorgi Sakvarelidze / Nika Jgerenaia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:45", "court": "Blue 1", "group": "C", "t1": "Nikoloz Sakhvadze / Andria Kharbedia", "t2": "Mirian Intskirveli / Guja Iremashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:45", "court": "Blue 2", "group": "G", "t1": "Tornike Chomakhidze / Giorgi Mateshvili", "t2": "Aleko Chakvetadze / Merab Chikvinidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "21:45", "court": "Blue 3", "group": "H", "t1": "Nina Songhulashvili / Irakli Merabishvili", "t2": "Saba Jinjikhadze / Saba Lobjanidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:20", "court": "Black 1", "group": "F", "t1": "Giorgi Buadze / Tamaz Jashi", "t2": "Gigi Jokhadze / Lasha Motsonelidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:20", "court": "Black 2", "group": "B", "t1": "Giorgi Sakvarelidze / Nika Jgerenaia", "t2": "Giorgi Krialashvili / Juba Topuria"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:20", "court": "Blue 1", "group": "C", "t1": "Mirian Intskirveli / Guja Iremashvili", "t2": "Valeri Samsonidze / Nika Shavishvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:20", "court": "Blue 2", "group": "G", "t1": "Aleko Chakvetadze / Merab Chikvinidze", "t2": "Lizi Kaviladze / Goga Tchkadua"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:20", "court": "Blue 3", "group": "H", "t1": "Saba Jinjikhadze / Saba Lobjanidze", "t2": "Giorgi Gendzekhadze / Sandro Gvaramia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:55", "court": "Black 1", "group": "A", "t1": "Lasha Narimanidze / Nodo Namoradze", "t2": "Beka Ungiadze / Misho Maisuradze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:55", "court": "Black 2", "group": "D", "t1": "Irakli Kezherashvili / Mikheil Merebashvili", "t2": "Sashka Ochigava / Giorgi Kvirikashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "22:55", "court": "Blue 1", "group": "E", "t1": "Tornike Tchkonia / Goga Gochashvili", "t2": "Davit Endeladze / Saba Paitchadze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "23:30", "court": "Black 1", "group": "A", "t1": "Beka Ungiadze / Misho Maisuradze", "t2": "Lasha Tsaadze / Giorgi Mikadze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "23:30", "court": "Black 2", "group": "D", "t1": "Sashka Ochigava / Giorgi Kvirikashvili", "t2": "Nika Siradze / Rusa Adamia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "23:30", "court": "Blue 1", "group": "E", "t1": "Davit Endeladze / Saba Paitchadze", "t2": "Nikoloz Latsabidze / Ramini Tchumburidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:05", "court": "Black 1", "group": "A", "t1": "Lasha Tsaadze / Giorgi Mikadze", "t2": "Luka Vardishvili / Irakli Lomidze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:05", "court": "Black 2", "group": "D", "t1": "Nika Siradze / Rusa Adamia", "t2": "Saba Tsaadze / Davit Lursmanashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:05", "court": "Blue 1", "group": "E", "t1": "Nikoloz Latsabidze / Ramini Tchumburidze", "t2": "Irakli Gogokhia / Nika Gogokhia"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:40", "court": "Black 1", "group": "A", "t1": "Luka Vardishvili / Irakli Lomidze", "t2": "Saba Mania / Sukha Zviadauri"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:40", "court": "Black 2", "group": "D", "t1": "Saba Tsaadze / Davit Lursmanashvili", "t2": "Tsotne Kikvilashvili / Salome Sabanadze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "00:40", "court": "Blue 1", "group": "E", "t1": "Irakli Gogokhia / Nika Gogokhia", "t2": "Avtandil Olgesashvili / Levan Beriashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "01:15", "court": "Black 1", "group": "A", "t1": "Saba Mania / Sukha Zviadauri", "t2": "Lasha Narimanidze / Nodo Namoradze"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "01:15", "court": "Black 2", "group": "D", "t1": "Tsotne Kikvilashvili / Salome Sabanadze", "t2": "Irakli Kezherashvili / Mikheil Merebashvili"}, {"day": "Wednesday", "dayLabel": "ოთხშაბათი, 23 სექტემბერი", "time": "01:15", "court": "Blue 1", "group": "E", "t1": "Avtandil Olgesashvili / Levan Beriashvili", "t2": "Tornike Tchkonia / Goga Gochashvili"}], "groups": {"A": ["Lasha Narimanidze / Nodo Namoradze", "Luka Vardishvili / Irakli Lomidze", "Beka Ungiadze / Misho Maisuradze", "Saba Mania / Sukha Zviadauri", "Lasha Tsaadze / Giorgi Mikadze"], "B": ["Giorgi Krialashvili / Juba Topuria", "Irakli Kapanadze / Tamari Natobishvili", "Niniko Khomeriki / Shota Glurjidze", "Giorgi Sakvarelidze / Nika Jgerenaia", "Giorgi Tsartsidze / Giorgi Girkelidze"], "C": ["Valeri Samsonidze / Nika Shavishvili", "Nikoloz Sakhvadze / Andria Kharbedia", "Nugzar Kobakhidze / Nino Chkhetia", "Mirian Intskirveli / Guja Iremashvili", "Tornike Kapanadze / Irakli Rukhaia"], "D": ["Irakli Kezherashvili / Mikheil Merebashvili", "Saba Tsaadze / Davit Lursmanashvili", "Sashka Ochigava / Giorgi Kvirikashvili", "Tsotne Kikvilashvili / Salome Sabanadze", "Nika Siradze / Rusa Adamia"], "E": ["Tornike Tchkonia / Goga Gochashvili", "Irakli Gogokhia / Nika Gogokhia", "Davit Endeladze / Saba Paitchadze", "Avtandil Olgesashvili / Levan Beriashvili", "Nikoloz Latsabidze / Ramini Tchumburidze"], "F": ["Gigi Jokhadze / Lasha Motsonelidze", "Lasha Dzneladze / Irakli Ghughunishvili", "Saba Baindurashvili / Mariam Munjishvili", "Giorgi Buadze / Tamaz Jashi", "Zaur Soselia / Luka Soselia"], "G": ["Lizi Kaviladze / Goga Tchkadua", "Tornike Chomakhidze / Giorgi Mateshvili", "Tsotne Kapanadze / Giorgi Tkhelidze", "Aleko Chakvetadze / Merab Chikvinidze", "Giorgi Janelidze / Badri Gorgodze"], "H": ["Giorgi Gendzekhadze / Sandro Gvaramia", "Nina Songhulashvili / Irakli Merabishvili", "Giorgi Rekhviashvili / Koka Akhvlediani", "Saba Jinjikhadze / Saba Lobjanidze", "Zuka Ghirdaladze / Aleks Kvaratskhelia"]}, "dayOrder": ["Tuesday", "Wednesday"], "dayNames": {"Tuesday": "სამშაბათი, 22 სექტემბერი", "Wednesday": "ოთხშაბათი, 23 სექტემბერი"}}</script>
+<script type="application/json" id="results-data">{}</script>
+<script>
+(function(){
+  "use strict";
+  var raw = document.getElementById('site-data').textContent;
+  var data;
+  try { data = JSON.parse(raw); } catch(e){ data = {matches:[],groups:{},dayOrder:[],dayNames:{}}; }
+
+  var matches = data.matches || [];
+  var groups = data.groups || {};
+  var dayOrder = data.dayOrder || [];
+  var dayNames = data.dayNames || {};
+  var groupLetters = Object.keys(groups).sort();
+
+  var results = {};
+  try {
+    var rraw = document.getElementById('results-data').textContent;
+    results = JSON.parse(rraw || '{}') || {};
+  } catch(e){ results = {}; }
+
+  var state = {
+    view: 'table',
+    day: dayOrder[0] || '',
+    group: groupLetters[0] || '',
+    query: '',
+    refMode: false,
+    canEdit: false,
+    expanded: {}
+  };
+
+  var viewToggle = document.getElementById('viewToggle');
+  var tableControls = document.getElementById('tableControls');
+  var dayTabsEl = document.getElementById('dayTabs');
+  var groupSelect = document.getElementById('groupSelect');
+  var mainArea = document.getElementById('mainArea');
+  var searchInput = document.getElementById('search');
+  var searchWrap = document.getElementById('searchWrap');
+  var searchClear = document.getElementById('searchClear');
+  var refToggleBtn = document.getElementById('refToggle');
+  var saveToast = document.getElementById('saveToast');
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function highlight(name, q){
+    if(!q) return esc(name);
+    var idx = name.toLowerCase().indexOf(q.toLowerCase());
+    if(idx === -1) return esc(name);
+    return esc(name.slice(0,idx)) + '<mark>' + esc(name.slice(idx, idx+q.length)) + '</mark>' + esc(name.slice(idx+q.length));
+  }
+
+  function courtClass(court){
+    return court.indexOf('Black') === 0 ? 'court-black' : 'court-blue';
+  }
+
+  function matchId(m){
+    return m.day.slice(0,3) + '_' + m.time.replace(':','') + '_' + m.court.replace(/\s+/g,'');
+  }
+
+  function ordinal(n){
+    var s = ["th","st","nd","rd"], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  }
+
+  // ---- score / result helpers ----
+  function decideSets(sets){
+    var aWins=0, bWins=0, aGames=0, bGames=0, played=0;
+    (sets||[]).forEach(function(s){
+      if(!s) return;
+      var a=s.a, b=s.b;
+      if(a===null || a===undefined || a==='' || b===null || b===undefined || b===''){ return; }
+      a = Number(a); b = Number(b);
+      if(isNaN(a) || isNaN(b)) return;
+      played++;
+      aGames += a; bGames += b;
+      if(a>b) aWins++; else if(b>a) bWins++;
+    });
+    var winner = null;
+    if(aWins !== bWins && (aWins+bWins) > 0) winner = aWins > bWins ? 't1' : 't2';
+    return {aWins:aWins, bWins:bWins, aGames:aGames, bGames:bGames, played:played, winner:winner};
+  }
+
+  function scoreSummary(sets){
+    return (sets||[]).filter(function(s){
+      return s && s.a!==null && s.a!==undefined && s.a!=='' && s.b!==null && s.b!==undefined && s.b!=='';
+    }).map(function(s){ return s.a + '-' + s.b; }).join(', ');
+  }
+
+  // ---- capabilities (artifact publish + permission check) ----
+  var artifactCap = null;
+
+  function initCapabilities(){
+    if(!(window.claude && typeof window.claude.use === 'function')) return;
+    Promise.resolve(window.claude.use('artifact')).then(function(cap){
+      artifactCap = cap || null;
+    }).catch(function(){ artifactCap = null; });
+    Promise.resolve(window.claude.use('user')).then(function(userCap){
+      if(!userCap) return false;
+      return userCap.canEdit();
+    }).then(function(canEdit){
+      if(canEdit){
+        state.canEdit = true;
+        refToggleBtn.hidden = false;
+      }
+    }).catch(function(){});
+  }
+
+  function showToast(msg, isError){
+    saveToast.textContent = msg;
+    saveToast.classList.toggle('error', !!isError);
+    saveToast.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){ saveToast.hidden = true; }, 2200);
+  }
+
+  var saveTimer = null, saveInFlight = false, savePending = false;
+  function scheduleSave(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, 800);
+  }
+  function doSave(){
+    if(saveInFlight){ savePending = true; return; }
+    if(!artifactCap){ showToast('Cannot save — no edit access', true); return; }
+    saveInFlight = true;
+    showToast('Saving…');
+    var html = buildPublishHtml();
+    Promise.resolve(artifactCap.publish(html)).then(function(){
+      saveInFlight = false;
+      showToast('Saved');
+      if(savePending){ savePending = false; scheduleSave(); }
+    }).catch(function(){
+      saveInFlight = false;
+      showToast('Save failed', true);
+    });
+  }
+  function buildPublishHtml(){
+    var rd = document.getElementById('results-data');
+    rd.textContent = JSON.stringify(results);
+    return '<!doctype html>\n' + document.documentElement.outerHTML;
+  }
+
+  // ---- view / nav wiring ----
+  function setView(view){
+    state.view = view;
+    Array.prototype.forEach.call(viewToggle.querySelectorAll('.view-btn'), function(btn){
+      btn.classList.toggle('active', btn.dataset.view === view);
+    });
+    tableControls.hidden = view !== 'table';
+    dayTabsEl.hidden = view !== 'schedule';
+    searchInput.placeholder = view === 'table' ? 'Search teams' : 'Search your team';
+    render();
+  }
+  viewToggle.addEventListener('click', function(e){
+    var btn = e.target.closest('.view-btn');
+    if(!btn) return;
+    setView(btn.dataset.view);
+  });
+
+  function buildGroupSelect(){
+    groupSelect.innerHTML = groupLetters.map(function(g){
+      return '<option value="' + esc(g) + '">Group ' + esc(g) + '</option>';
+    }).join('');
+    groupSelect.value = state.group;
+  }
+  groupSelect.addEventListener('change', function(){
+    state.group = groupSelect.value;
+    render();
+  });
+
+  function buildDayTabs(){
+    dayTabsEl.innerHTML = '';
+    dayOrder.forEach(function(day){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab' + (day === state.day ? ' active' : '');
+      btn.setAttribute('role','tab');
+      btn.dataset.day = day;
+      var label = (dayNames[day] || day).split(',');
+      btn.innerHTML = esc(label[0]) + (label[1] ? '<span>' + esc(label[1].trim()) + '</span>' : '');
+      btn.addEventListener('click', function(){
+        state.day = day;
+        buildDayTabs();
+        render();
+      });
+      dayTabsEl.appendChild(btn);
+    });
+  }
+
+  // ---- schedule (match) cards ----
+  function scoreFormHtml(m, mid){
+    var r = results[mid];
+    var sets = (r && r.sets) ? r.sets.slice() : [];
+    while(sets.length < 3) sets.push({});
+    var dec = decideSets(sets);
+    var rows = [0,1,2].map(function(i){
+      var s = sets[i] || {};
+      var av = (s.a === null || s.a === undefined) ? '' : s.a;
+      var bv = (s.b === null || s.b === undefined) ? '' : s.b;
+      return '<div class="set-row">' +
+        '<span class="set-label">Set ' + (i+1) + '</span>' +
+        '<input type="number" class="set-input" inputmode="numeric" min="0" max="9" data-set="' + i + '" data-side="a" value="' + esc(av) + '">' +
+        '<span class="set-colon">:</span>' +
+        '<input type="number" class="set-input" inputmode="numeric" min="0" max="9" data-set="' + i + '" data-side="b" value="' + esc(bv) + '">' +
+      '</div>';
+    }).join('');
+    var liveLabel = dec.winner
+      ? ('&#10003; Winner: ' + (dec.winner === 't1' ? esc(m.t1) : esc(m.t2)))
+      : 'Result incomplete';
+    return '<div class="matchup">' +
+        '<span class="team">' + esc(m.t1) + '</span>' +
+        '<span class="vs">VS</span>' +
+        '<span class="team">' + esc(m.t2) + '</span>' +
+      '</div>' +
+      '<div class="score-form">' + rows + '<div class="result-live">' + liveLabel + '</div></div>';
+  }
+
+  function cardHtml(m, opts){
+    opts = opts || {};
+    var showDayTime = !!opts.showDayTime;
+    var mid = matchId(m);
+    var r = results[mid];
+    var dec = r ? decideSets(r.sets) : null;
+    var hasResult = !!(dec && dec.winner);
+    var refEditable = state.refMode && state.canEdit;
+
+    var body;
+    if(refEditable){
+      body = scoreFormHtml(m, mid);
+    } else if(hasResult){
+      body = '<div class="matchup">' +
+          '<span class="team' + (dec.winner==='t1' ? ' won' : '') + '">' + highlight(m.t1, state.query) + '</span>' +
+          '<span class="vs result">' + esc(scoreSummary(r.sets)) + '</span>' +
+          '<span class="team' + (dec.winner==='t2' ? ' won' : '') + '">' + highlight(m.t2, state.query) + '</span>' +
+        '</div>';
+    } else {
+      body = '<div class="matchup">' +
+          '<span class="team">' + highlight(m.t1, state.query) + '</span>' +
+          '<span class="vs">VS</span>' +
+          '<span class="team">' + highlight(m.t2, state.query) + '</span>' +
+        '</div>';
+    }
+
+    return '<div class="card' + (hasResult ? ' has-result' : '') + '" data-match-id="' + mid + '">' +
+        '<div class="card-meta">' +
+          '<span class="chip ' + courtClass(m.court) + '">' + esc(m.court) + '</span>' +
+          '<span class="chip group">Group ' + esc(m.group) + '</span>' +
+          (showDayTime ? '<span class="day-time">' + esc((dayNames[m.day]||'').split(',')[0]) + ' · ' + esc(m.time) + '</span>' : '') +
+        '</div>' +
+        body +
+      '</div>';
+  }
+
+  function renderScheduleView(){
+    if(state.query.trim()){
+      var q = state.query.toLowerCase();
+      var found = matches.filter(function(m){
+        return m.t1.toLowerCase().indexOf(q) !== -1 || m.t2.toLowerCase().indexOf(q) !== -1;
+      });
+      if(!found.length){
+        mainArea.innerHTML = '<div class="empty">No matches found for "' + esc(state.query) + '"</div>';
+        return;
+      }
+      mainArea.innerHTML = '<div class="slot"><div class="cards">' +
+        found.map(function(m){ return cardHtml(m, {showDayTime:true}); }).join('') +
+      '</div></div>';
+      return;
+    }
+
+    var dayMatches = matches.filter(function(m){ return m.day === state.day; });
+    if(!dayMatches.length){
+      mainArea.innerHTML = '<div class="empty">No matches on this day</div>';
+      return;
+    }
+    var order = [];
+    var bySlot = {};
+    dayMatches.forEach(function(m){
+      if(!bySlot[m.time]){ bySlot[m.time] = []; order.push(m.time); }
+      bySlot[m.time].push(m);
+    });
+    var html = '';
+    order.forEach(function(time){
+      var list = bySlot[time];
+      html += '<div class="slot">' +
+        '<div class="slot-head"><span class="time mono">' + esc(time) + '</span><span class="count">' + list.length + ' matches</span></div>' +
+        '<div class="cards">' + list.map(function(m){ return cardHtml(m); }).join('') + '</div>' +
+      '</div>';
+    });
+    mainArea.innerHTML = html;
+  }
+
+  // ---- standings ----
+  function computeGroupStats(g){
+    var teams = groups[g] || [];
+    var stats = {};
+    teams.forEach(function(t){
+      stats[t] = {team:t, played:0, wins:0, losses:0, setsW:0, setsL:0, gamesW:0, gamesL:0, tied:false};
+    });
+    matches.filter(function(m){ return m.group === g; }).forEach(function(m){
+      var r = results[matchId(m)];
+      if(!r) return;
+      var dec = decideSets(r.sets);
+      if(!dec.winner) return;
+      var sa = stats[m.t1], sb = stats[m.t2];
+      if(!sa || !sb) return;
+      sa.played++; sb.played++;
+      sa.setsW += dec.aWins; sa.setsL += dec.bWins;
+      sb.setsW += dec.bWins; sb.setsL += dec.aWins;
+      sa.gamesW += dec.aGames; sa.gamesL += dec.bGames;
+      sb.gamesW += dec.bGames; sb.gamesL += dec.aGames;
+      if(dec.winner === 't1'){ sa.wins++; sb.losses++; } else { sb.wins++; sa.losses++; }
+    });
+    return stats;
+  }
+
+  function h2hWins(list, g){
+    var names = {};
+    list.forEach(function(s){ names[s.team] = true; });
+    var w = {};
+    list.forEach(function(s){ w[s.team] = 0; });
+    matches.filter(function(m){ return m.group === g && names[m.t1] && names[m.t2]; }).forEach(function(m){
+      var r = results[matchId(m)];
+      if(!r) return;
+      var dec = decideSets(r.sets);
+      if(!dec.winner) return;
+      if(dec.winner === 't1') w[m.t1]++; else w[m.t2]++;
+    });
+    return w;
+  }
+
+  function groupByDesc(list, fn){
+    var byKey = {}, keys = [];
+    list.forEach(function(s){
+      var k = fn(s);
+      if(!(k in byKey)){ byKey[k] = []; keys.push(k); }
+      byKey[k].push(s);
+    });
+    keys.sort(function(a,b){ return b - a; });
+    return keys.map(function(k){ return byKey[k]; });
+  }
+
+  function rankGroup(g){
+    var stats = computeGroupStats(g);
+    var teams = (groups[g] || []).map(function(t){ return stats[t]; }).filter(Boolean);
+    var ranked = [];
+    groupByDesc(teams, function(s){ return s.wins; }).forEach(function(winGroup){
+      if(winGroup.length === 1){ ranked.push(winGroup[0]); return; }
+      var w = h2hWins(winGroup, g);
+      groupByDesc(winGroup, function(s){ return w[s.team]; }).forEach(function(hGroup){
+        if(hGroup.length === 1){ ranked.push(hGroup[0]); return; }
+        groupByDesc(hGroup, function(s){ return s.setsW - s.setsL; }).forEach(function(setGroup){
+          if(setGroup.length === 1){ ranked.push(setGroup[0]); return; }
+          groupByDesc(setGroup, function(s){ return s.gamesW - s.gamesL; }).forEach(function(gameGroup){
+            if(gameGroup.length === 1){ ranked.push(gameGroup[0]); return; }
+            groupByDesc(gameGroup, function(s){ return s.gamesW; }).forEach(function(finalGroup){
+              finalGroup = finalGroup.slice().sort(function(a,b){ return a.team.localeCompare(b.team); });
+              if(finalGroup.length > 1){ finalGroup.forEach(function(s){ s.tied = true; }); }
+              ranked = ranked.concat(finalGroup);
+            });
+          });
+        });
+      });
+    });
+    return ranked;
+  }
+
+  function matchIdSafe(team){
+    return team.replace(/[^a-zA-Z0-9]/g, '').slice(0,40);
+  }
+
+  function render(){
+    if(state.view === 'table'){
+      // annotate rank before render (rankGroup doesn't know positions across filters)
+      renderTableViewWithRanks();
+    } else {
+      renderScheduleView();
+    }
+  }
+
+  function renderTableViewWithRanks(){
+    var g = state.group;
+    var full = rankGroup(g);
+    full.forEach(function(s, i){ s.__rank = i + 1; });
+    renderTableViewFrom(full);
+  }
+  function renderTableViewFrom(rankedFull){
+    var q = state.query.trim().toLowerCase();
+    var ranked = q ? rankedFull.filter(function(s){ return s.team.toLowerCase().indexOf(q) !== -1; }) : rankedFull;
+    if(!ranked.length){
+      mainArea.innerHTML = '<div class="group-empty">No teams found' + (q ? ' for "' + esc(state.query) + '"' : '') + '</div>';
+      return;
+    }
+    var hasAnyResult = rankedFull.some(function(s){ return s.played > 0; });
+    var anyTied = false;
+    var rows = ranked.map(function(s){
+      var rank = s.__rank;
+      var showTied = s.tied && hasAnyResult;
+      if(showTied) anyTied = true;
+      var posClass = rank === 1 ? 'pos-1' : rank === 2 ? 'pos-2' : rank === 3 ? 'pos-3' : '';
+      var diffSets = s.setsW - s.setsL;
+      var diffGames = s.gamesW - s.gamesL;
+      var pts = s.wins * 2;
+      var key = matchIdSafe(s.team);
+      var isOpen = !!state.expanded[key];
+      return '<div class="standings-row' + (showTied ? ' tied' : '') + '" data-team-key="' + key + '">' +
+          '<span class="pos-badge ' + posClass + '">' + ordinal(rank) + '</span>' +
+          '<div class="team-names">' + s.team.split(' / ').map(function(p){ return '<span>' + highlight(p, state.query) + '</span>'; }).join('') + (showTied ? ' <span class="tie-flag">*</span>' : '') + '</div>' +
+          '<button class="row-expand' + (isOpen ? ' open' : '') + '" data-team-key="' + key + '" type="button" aria-label="Details">&#9660;</button>' +
+          '<div class="stat-cluster">' +
+            '<div class="stat"><b>' + s.wins + '</b><small>W</small></div>' +
+            '<div class="stat"><b>' + s.losses + '</b><small>L</small></div>' +
+            '<div class="stat"><b>' + pts + '</b><small>Pts</small></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="row-detail' + (isOpen ? ' open' : '') + '" data-team-detail="' + key + '">' +
+          'Played <b>' + s.played + '</b> · Sets <b>' + (diffSets>0?'+':'') + diffSets + '</b> · Games <b>' + (diffGames>0?'+':'') + diffGames + '</b>' +
+        '</div>';
+    }).join('');
+    mainArea.innerHTML = '<div class="standings-card">' +
+        '<div class="standings-head"><span class="head-pos">Pos</span><span class="head-team">Team</span><span class="head-chevron"></span><span class="head-stats"><span>W</span><span>L</span><span>Pts</span></span></div>' +
+        rows +
+      '</div>' +
+      (anyTied ? '<p class="tie-note">* Tied on all criteria — resolved by a draw</p>' : '');
+  }
+
+  mainArea.addEventListener('click', function(e){
+    var btn = e.target.closest('.row-expand');
+    if(!btn) return;
+    var key = btn.dataset.teamKey;
+    state.expanded[key] = !state.expanded[key];
+    btn.classList.toggle('open', state.expanded[key]);
+    var detail = mainArea.querySelector('[data-team-detail="' + key + '"]');
+    if(detail) detail.classList.toggle('open', state.expanded[key]);
+  });
+
+  // ---- referee score input (event delegation; never re-renders the schedule on keystroke) ----
+  mainArea.addEventListener('input', function(e){
+    var t = e.target;
+    if(!t.classList || !t.classList.contains('set-input')) return;
+    var card = t.closest('.card');
+    if(!card) return;
+    var mid = card.dataset.matchId;
+    var setIdx = Number(t.dataset.set);
+    var side = t.dataset.side;
+    var val = t.value === '' ? null : Number(t.value);
+
+    if(!results[mid]) results[mid] = {sets:[{},{},{}]};
+    if(!results[mid].sets) results[mid].sets = [{},{},{}];
+    while(results[mid].sets.length < 3) results[mid].sets.push({});
+    if(!results[mid].sets[setIdx]) results[mid].sets[setIdx] = {};
+    results[mid].sets[setIdx][side] = val;
+    results[mid].updatedAt = Date.now();
+
+    var dec = decideSets(results[mid].sets);
+    var liveEl = card.querySelector('.result-live');
+    if(liveEl){
+      var m = matches.filter(function(mm){ return matchId(mm) === mid; })[0];
+      liveEl.innerHTML = dec.winner
+        ? ('&#10003; Winner: ' + esc(dec.winner === 't1' ? m.t1 : m.t2))
+        : 'Result incomplete';
+    }
+    card.classList.toggle('has-result', !!dec.winner);
+
+    scheduleSave();
+  });
+
+  refToggleBtn.addEventListener('click', function(){
+    state.refMode = !state.refMode;
+    refToggleBtn.classList.toggle('active', state.refMode);
+    refToggleBtn.textContent = state.refMode ? 'Referee Mode: ON' : 'Referee Mode';
+    if(state.view !== 'schedule') setView('schedule'); else render();
+  });
+
+  searchInput.addEventListener('input', function(){
+    state.query = searchInput.value;
+    searchWrap.classList.toggle('has-query', !!state.query);
+    render();
+  });
+  searchClear.addEventListener('click', function(){
+    searchInput.value = '';
+    state.query = '';
+    searchWrap.classList.remove('has-query');
+    searchInput.focus();
+    render();
+  });
+
+  buildGroupSelect();
+  buildDayTabs();
+  render();
+  initCapabilities();
+})();
+</script>
+
+</body>
+</html>
