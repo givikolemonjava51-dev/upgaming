@@ -1,4 +1,4 @@
-const { kv } = require('@vercel/kv');
+  const { kv } = require('@vercel/kv');
 
 module.exports = async (req, res) => {
   // same-origin app, but keep this permissive in case the page is opened from a preview URL
