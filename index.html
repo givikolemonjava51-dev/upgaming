@@ -749,16 +749,15 @@
   });
 
   // ---- auto-fill the opponent's game count for a standard set / match tiebreak ----
-  // Sets 1 & 2 (indices 0,1): a normal set to 6, win by 2 (6-0..6-4, or 7-5).
-  //   Entering 0-4 on one side auto-fills 6 on the other; entering 5 auto-fills 7.
+  // Sets 1 & 2 (indices 0,1): a short set to 4 games (breaker at 3-3, recorded as 4-3).
+  //   Entering 0-3 on one side auto-fills 4 on the other.
   // Set 3 (index 2): a match tiebreak to 10, win by 2.
   //   Entering 0-8 on one side auto-fills 10 on the other; entering 9 auto-fills 11.
   // Only fills a field that is still empty, so it never overwrites a value already typed.
   function autoOpponentScore(setIdx, val){
     if(val === null || isNaN(val)) return null;
     if(setIdx === 0 || setIdx === 1){
-      if(val >= 0 && val <= 4) return 6;
-      if(val === 5) return 7;
+      if(val >= 0 && val <= 3) return 4;
       return null;
     }
     if(setIdx === 2){
