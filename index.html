@@ -748,6 +748,27 @@
     if(detail) detail.classList.toggle('open', state.expanded[key]);
   });
 
+  // ---- auto-fill the opponent's game count for a standard set / match tiebreak ----
+  // Sets 1 & 2 (indices 0,1): a normal set to 6, win by 2 (6-0..6-4, or 7-5).
+  //   Entering 0-4 on one side auto-fills 6 on the other; entering 5 auto-fills 7.
+  // Set 3 (index 2): a match tiebreak to 10, win by 2.
+  //   Entering 0-8 on one side auto-fills 10 on the other; entering 9 auto-fills 11.
+  // Only fills a field that is still empty, so it never overwrites a value already typed.
+  function autoOpponentScore(setIdx, val){
+    if(val === null || isNaN(val)) return null;
+    if(setIdx === 0 || setIdx === 1){
+      if(val >= 0 && val <= 4) return 6;
+      if(val === 5) return 7;
+      return null;
+    }
+    if(setIdx === 2){
+      if(val >= 0 && val <= 8) return 10;
+      if(val === 9) return 11;
+      return null;
+    }
+    return null;
+  }
+
   // ---- referee score input (event delegation; never re-renders the schedule on keystroke) ----
   mainArea.addEventListener('input', function(e){
     var t = e.target;
@@ -765,6 +786,16 @@
     if(!results[mid].sets[setIdx]) results[mid].sets[setIdx] = {};
     results[mid].sets[setIdx][side] = val;
     results[mid].updatedAt = Date.now();
+
+    var otherSide = side === 'a' ? 'b' : 'a';
+    var otherInput = card.querySelector('.set-input[data-set="' + setIdx + '"][data-side="' + otherSide + '"]');
+    if(otherInput && otherInput.value === ''){
+      var autoVal = autoOpponentScore(setIdx, val);
+      if(autoVal !== null){
+        otherInput.value = autoVal;
+        results[mid].sets[setIdx][otherSide] = autoVal;
+      }
+    }
 
     var dec = decideSets(results[mid].sets);
     var liveEl = card.querySelector('.result-live');
